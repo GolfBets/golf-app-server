@@ -119,6 +119,19 @@ server.route({
 	}
 });
 
+server.route({
+	method: 'POST',
+	path: '/newGame',
+	handler: function (request, reply) {
+		Course.findOne({where: {name: request.payload.course}}).then(function (course) {
+			Game.create().then(function (game) {
+				game.belongsTo(course);
+				
+			})
+		})
+	}	
+});
+
 server.start(function () {
     console.log('Server running at:', server.info.uri);
 });
