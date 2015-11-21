@@ -99,6 +99,26 @@ server.route({
 	}
 });
 
+server.route({
+	method: 'GET',
+	path: '/users',
+	handler: function (request, reply) {
+		User.findAll({include: [{model: Score, as: 'individualgame'}]}).done(function (users) {
+			reply(users);
+		})
+	}
+});
+
+server.route({
+	method: "GET",
+	path: "/courses",
+	handler: function (request, reply) {
+		Course.findAll().done(function (courses) {
+			reply(courses);
+		})
+	}
+});
+
 server.start(function () {
     console.log('Server running at:', server.info.uri);
 });
