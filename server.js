@@ -16,7 +16,18 @@ var sequelize = new Sequelize('golf', 'postgres', 'postgres', {
 sequelize.sync()
 
 
-
+server.register(require('inert'), function (err) {
+    if (err) {
+        throw err;
+    }
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: function (request, reply) {
+            reply.file('./index.html');
+        }
+    });
+});
 
 server.start(function () {
     console.log('Server running at:', server.info.uri);
