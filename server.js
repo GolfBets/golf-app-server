@@ -79,6 +79,26 @@ server.route({
 	}
 });
 
+server.route({
+	method: 'POST',
+	path: '/createcourse',
+	handler: function (request, reply) {
+		Course.findOrCreate({where: {name: request.payload.name}, defaults: {
+			rating: request.payload.rating,
+			slope: request.payload.slope,
+			par: request.payload.par,
+			handicap: request.payload.handicap
+		}}).spread(function (course, created) {
+			if (!created) {
+				reply('Already exists');
+			}
+			else {
+				reply(course);
+			}
+		})
+	}
+});
+
 server.start(function () {
     console.log('Server running at:', server.info.uri);
 });
