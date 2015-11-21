@@ -1,0 +1,19 @@
+{
+  "name": "golf-app-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon ./server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RyanYocum/golf-app-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RyanYocum/golf-app-server/issues"
+  },
+  "homepage": "https://github.com/RyanYocum/golf-app-server#readme"
+}
