@@ -59,6 +59,26 @@ server.register(require('inert'), function (err) {
     });
 });
 
+server.route({
+	method: 'POST',
+	path: '/createuser',
+	handler: function (request, reply) {
+		User.findOrCreate({where: {username: request.payload.username}, defaults: {
+			email: request.payload.email,
+			password: request.payload.password,
+			handicap: request.payload.handicap,
+			winnings: 0
+		}}).spread( function (user, created) {
+			if (created === false) {
+				reply('user already exists');
+			}
+			else {
+				reply('user created');
+			}
+		})
+	}
+});
+
 server.start(function () {
     console.log('Server running at:', server.info.uri);
 });
