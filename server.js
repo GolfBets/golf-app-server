@@ -36,6 +36,13 @@ var Game = sequelize.define('game', {
 	inprogress: { type: Sequelize.BOOLEAN}
 });
 
+User.belongsToMany(Score, {as: 'individualgame', through: 'individualgame'});
+Score.belongsToMany(User, {as: 'individualgame', through: 'individualgame'});
+Score.belongsTo(Game, {as: 'game'});
+// Game.belongsToMany(Score, {as: 'player', through: 'player'});
+Game.belongsTo(Course, {as: 'course'});
+
+
 sequelize.sync()
 
 
