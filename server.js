@@ -132,6 +132,14 @@ server.route({
 	}	
 });
 
+// server.route({
+// 	method: 'POST',
+// 	path: '/updateGame',
+// 	handler: function (request, reply) {
+// 		Course.findOne({where: {}})
+// 	}
+// })
+
 server.start(function () {
     console.log('Server running at:', server.info.uri);
 });
