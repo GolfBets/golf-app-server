@@ -8,7 +8,7 @@ var Sequelize = require('sequelize');
 var sequelize = new Sequelize('golf', 'postgres', 'postgres', {
   host: 'localhost',
   dialect: 'postgres',
-  logging: false
+  // logging: false
 });
 
 var User = sequelize.define('user', {
@@ -40,7 +40,7 @@ User.belongsToMany(Score, {as: 'individualgame', through: 'individualgame'});
 Score.belongsToMany(User, {as: 'individualgame', through: 'individualgame'});
 Score.belongsTo(Game, {as: 'game'});
 // Game.belongsToMany(Score, {as: 'player', through: 'player'});
-Game.belongsTo(Course, {as: 'course'});
+Game.belongsTo(Course);
 
 
 sequelize.sync()
@@ -124,21 +124,57 @@ server.route({
 	path: '/newGame',
 	handler: function (request, reply) {
 		Course.findOne({where: {name: request.payload.course}}).then(function (course) {
-			Game.create().then(function (game) {
-				game.belongsTo(course);
-				
+			Game.create({courseId: course.id}).then(function (game) {
+
+				game.add(course).then(function () {
+					console.log('hi')
+					for (var i = 0; i < request.payload.user.length; i++) {
+						Score.create().then(function (score) {
+							User.findOne({where: {username: request.payload.user[i]}}).then(function (user) {
+								score.belongsTo(user).then(function () {
+									user.belongsTo(score).then(function () {
+										score.belongsTo(game)
+									})
+								})
+							})
+						})
+					}
+					reply('Game Created');
+				})
 			})
 		})
 	}	
 });
 
-// server.route({
-// 	method: 'POST',
-// 	path: '/updateGame',
-// 	handler: function (request, reply) {
-// 		Course.findOne({where: {}})
-// 	}
-// })
+server.route({
+	method: 'GET',
+	path: '/getAllGames',
+	handler: function (request, reply) {
+		Game.findAll({include: [{model: Course, on: 'courseId'}]}).then(function (games) {
+			console.log(games);
+			reply(games)
+		})
+	}
+});
+
+server.route({
+	method: 'GET',
+	path: '/getGamesFromUser',
+	handler: function (request, reply) {
+		User.findOne({where: {id: 1}, include: [{model: Score, as: 'individualgame'}]}).then(function (user) {
+			console.log(user);
+			reply(user);
+		})
+	}
+})
+
+server.route({
+	method: 'POST',
+	path: '/postHoleScore',
+	handler: function (request, reply) {
+		Game.findOne({where: {}})
+	}
+});
 
 server.start(function () {
     console.log('Server running at:', server.info.uri);
