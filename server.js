@@ -125,7 +125,17 @@ server.route({
 			reply(courses);
 		})
 	}
-})
+});
+
+sever.route({
+	method: "GET",
+	path: "/course/{name*}",
+	handler: function (request, reply) {
+		Course.findOne({where: {name: request.params.name}}).done(function (course) {
+			reply(course);
+		})
+	}
+});
 
 server.route({
 	method: 'POST',
