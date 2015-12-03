@@ -84,8 +84,6 @@ server.route({
 	path: '/createcourse',
 	handler: function (request, reply) {
 		Course.findOrCreate({where: {name: request.payload.name}, defaults: {
-			rating: request.payload.rating,
-			slope: request.payload.slope,
 			par: request.payload.par,
 			handicap: request.payload.handicap
 		}}).spread(function (course, created) {
