@@ -118,6 +118,16 @@ server.route({
 });
 
 server.route({
+	method: "GET",
+	path: "/coursenames",
+	handler: function (request, reply) {
+		Course.findAll({attributes: ['name']}).done(function (courses) {
+			reply(courses);
+		})
+	}
+})
+
+server.route({
 	method: 'POST',
 	path: '/newGame',
 	handler: function (request, reply) {
