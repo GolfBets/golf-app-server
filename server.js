@@ -20,11 +20,15 @@ var User = sequelize.define('user', {
 });
 
 var Course = sequelize.define('course', {
+	county: Sequelize.STRING,
+	city: Sequelize.STRING,
 	name: Sequelize.STRING,
 	rating: Sequelize.FLOAT,
 	slope: Sequelize.FLOAT,
 	par:  { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
-	handicap:  { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null}
+	hdcp:  { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
+	parL:  { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
+	hdcpL:  { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
 });
 
 var Score = sequelize.define('score', {
@@ -127,7 +131,7 @@ server.route({
 	}
 });
 
-sever.route({
+server.route({
 	method: "GET",
 	path: "/course/{name*}",
 	handler: function (request, reply) {
