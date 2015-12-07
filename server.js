@@ -22,8 +22,8 @@ var User = sequelize.define('user', {
 var Course = sequelize.define('course', {
 	county: Sequelize.STRING,
 	city: Sequelize.STRING,
-	name: Sequelize.STRING,
-	rating: Sequelize.FLOAT,
+	name: Sequelize.STRING
+,	rating: Sequelize.FLOAT,
 	slope: Sequelize.FLOAT,
 	par:  { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
 	hdcp:  { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
@@ -130,6 +130,28 @@ server.route({
 		})
 	}
 });
+
+server.route({
+	method: "GET",
+	path: "/coursenames/{location*1}",
+	handler: function (request, reply) {
+		var location = request.params.location
+		Course.findAll({where: {county: location}, attributes: ['name', 'city'], order: 'name DESC'}).then(function (courses) {
+			reply(courses);
+		})		
+	}
+})
+
+server.route({
+	method: "GET",
+	path: "/coursenames/{location*2}",
+	handler: function (request, reply) {
+		var location = request.params.location.split('/');
+		Course.findAll({where: {county: location[0], city: location[1]}, attributes: ['name'], order: 'name DESC'}).then(function (courses) {
+			reply(courses);
+		})		
+	}
+})
 
 server.route({
 	method: "GET",
