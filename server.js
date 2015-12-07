@@ -136,7 +136,7 @@ server.route({
 	path: "/coursenames/{location*1}",
 	handler: function (request, reply) {
 		var location = request.params.location
-		Course.findAll({where: {county: location}, attributes: ['name', 'city'], order: 'name DESC'}).then(function (courses) {
+		Course.findAll({where: {county: location}, attributes: ['name', 'city'], order: 'name ASC'}).then(function (courses) {
 			reply(courses);
 		})		
 	}
@@ -147,9 +147,20 @@ server.route({
 	path: "/coursenames/{location*2}",
 	handler: function (request, reply) {
 		var location = request.params.location.split('/');
-		Course.findAll({where: {county: location[0], city: location[1]}, attributes: ['name'], order: 'name DESC'}).then(function (courses) {
+		Course.findAll({where: {county: location[0], city: location[1]}, attributes: ['name'], order: 'name ASC'}).then(function (courses) {
 			reply(courses);
 		})		
+	}
+});
+
+server.route({
+	method: "GET",
+	path: "/coursesbycity/{city}",
+	handler: function (request, reply) {
+		var city = request.params.city;
+		Course.findAll({where: {city: {$iLike: city}}, attributes: ['name'], order: 'name ASC'}).then(function (courses) {
+			reply(courses);
+		})
 	}
 })
 
@@ -157,7 +168,7 @@ server.route({
 	method: "GET",
 	path: "/course/{name*}",
 	handler: function (request, reply) {
-		Course.findOne({where: {name: request.params.name}}).done(function (course) {
+		Course.findOne({where: {name: {$iLike: request.params.name}}}).done(function (course) {
 			reply(course);
 		})
 	}
