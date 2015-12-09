@@ -8,7 +8,7 @@ var Sequelize = require('sequelize');
 var sequelize = new Sequelize('golf', 'postgres', 'postgres', {
   host: 'localhost',
   dialect: 'postgres',
-  // logging: false
+  logging: false
 });
 
 var User = sequelize.define('user', {
@@ -22,8 +22,8 @@ var User = sequelize.define('user', {
 var Course = sequelize.define('course', {
 	county: Sequelize.STRING,
 	city: Sequelize.STRING,
-	name: Sequelize.STRING
-,	rating: Sequelize.FLOAT,
+	name: Sequelize.STRING,
+	rating: Sequelize.FLOAT,
 	slope: Sequelize.FLOAT,
 	par:  { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
 	hdcp:  { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
@@ -40,10 +40,11 @@ var Game = sequelize.define('game', {
 	inprogress: { type: Sequelize.BOOLEAN}
 });
 
-User.belongsToMany(Score, {as: 'individualgame', through: 'individualgame'});
-Score.belongsToMany(User, {as: 'individualgame', through: 'individualgame'});
-Score.belongsTo(Game, {as: 'game'});
-// Game.belongsToMany(Score, {as: 'player', through: 'player'});
+User.hasMany(Score);
+// Score.belongsTo(User);
+// Score.belongsToMany(User, {as: 'individualgame', through: 'individualgame'});
+Score.belongsToMany(Game, {as: 'individualgame', through: 'individualgame'});
+Game.belongsToMany(Score, {as: 'individualgame', through: 'individualgame'});
 Game.belongsTo(Course);
 
 
@@ -178,22 +179,49 @@ server.route({
 	method: 'POST',
 	path: '/newGame',
 	handler: function (request, reply) {
+		// console.log(request)
+		console.log('recieved request');
 		Course.findOne({where: {name: request.payload.course}}).then(function (course) {
+			console.log('found course')
 			Game.create({courseId: course.id}).then(function (game) {
+				console.log('created game');
+				game.setCourse(course).then(function () {
+					console.log('added course')
+					console.log(request.payload.user)
+					// for (var i = 0; i < request.payload.user.length; i++) {
 
-				game.add(course).then(function () {
-					console.log('hi')
-					for (var i = 0; i < request.payload.user.length; i++) {
-						Score.create().then(function (score) {
-							User.findOne({where: {username: request.payload.user[i]}}).then(function (user) {
-								score.belongsTo(user).then(function () {
-									user.belongsTo(score).then(function () {
-										score.belongsTo(game)
-									})
-								})
+						//putting in a for loop caused async issues, loop finishes before user finding ever happens
+
+						Score.create({playernumber: 0}).then(function (score) {
+							score.addIndividualgame(game);
+							// game.addIndividualgame(score);
+							User.findOne({where: {username: request.payload.user[0]}}).then(function (user) {
+								user.addScore(score)
 							})
 						})
-					}
+						Score.create({playernumber: 1}).then(function (score) {
+							score.addIndividualgame(game);
+							// game.addIndividualgame(score);
+							User.findOne({where: {username: request.payload.user[1]}}).then(function (user) {
+								user.addScore(score)
+							})
+						})
+						Score.create({playernumber: 2}).then(function (score) {
+							score.addIndividualgame(game);
+							// game.addIndividualgame(score);
+							User.findOne({where: {username: request.payload.user[2]}}).then(function (user) {
+								user.addScore(score)
+							})
+						})
+						Score.create({playernumber: 3}).then(function (score) {
+							score.addIndividualgame(game);
+							// game.addIndividualgame(score);
+							User.findOne({where: {username: request.payload.user[3]}}).then(function (user) {
+								user.addScore(score)
+							})
+						})
+						
+					// }
 					reply('Game Created');
 				})
 			})
