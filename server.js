@@ -41,6 +41,8 @@ var Game = sequelize.define('game', {
 });
 
 User.hasMany(Score);
+User.belongsToMany(Course, {as: 'favorites', through: 'favorites'});
+Course.belongsToMany(User, {as: 'favorites', through: 'favorites'});
 // Score.belongsTo(User);
 // Score.belongsToMany(User, {as: 'individualgame', through: 'individualgame'});
 Score.belongsToMany(Game, {as: 'individualgame', through: 'individualgame'});
@@ -106,11 +108,21 @@ server.route({
 	method: 'GET',
 	path: '/users',
 	handler: function (request, reply) {
-		User.findAll({include: [{model: Score, as: 'individualgame'}]}).done(function (users) {
+		User.findAll().done(function (users) {
 			reply(users);
 		})
 	}
 });
+
+server.route({
+	method: 'GET',
+	path: '/user/{user}',
+	handler: function (request, reply) {
+		User.findOne({where: {username: request.params.user}}, {include: [{model: Course, as: 'favorites'}]}).then( function (user) {
+			reply(user);
+		})
+	}
+})
 
 server.route({
 	method: "GET",
@@ -179,15 +191,9 @@ server.route({
 	method: 'POST',
 	path: '/newGame',
 	handler: function (request, reply) {
-		// console.log(request)
-		console.log('recieved request');
 		Course.findOne({where: {name: request.payload.course}}).then(function (course) {
-			console.log('found course')
 			Game.create({courseId: course.id}).then(function (game) {
-				console.log('created game');
 				game.setCourse(course).then(function () {
-					console.log('added course')
-					console.log(request.payload.user)
 					// for (var i = 0; i < request.payload.user.length; i++) {
 
 						//putting in a for loop caused async issues, loop finishes before user finding ever happens
