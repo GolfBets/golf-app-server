@@ -122,7 +122,7 @@ server.route({
 			reply(user);
 		})
 	}
-})
+});
 
 server.route({
 	method: "GET",
@@ -153,7 +153,7 @@ server.route({
 			reply(courses);
 		})		
 	}
-})
+});
 
 server.route({
 	method: "GET",
@@ -175,7 +175,7 @@ server.route({
 			reply(courses);
 		})
 	}
-})
+});
 
 server.route({
 	method: "GET",
@@ -236,6 +236,20 @@ server.route({
 });
 
 server.route({
+	method: 'POST',
+	path: '/addFavorite',
+	handler: function (request, reply) {
+		User.findOne({where: {username: request.payload.username}}).then(function (user) {
+			Course.findOne({where: {name: request.payload.course}}).then(function (course) {
+				user.addFavorite(course).then(function () {
+					reply('added favorite');
+				})
+			})
+		})
+	}
+})
+
+server.route({
 	method: 'GET',
 	path: '/getAllGames',
 	handler: function (request, reply) {
@@ -255,7 +269,7 @@ server.route({
 			reply(user);
 		})
 	}
-})
+});
 
 server.route({
 	method: 'POST',
