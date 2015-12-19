@@ -247,7 +247,17 @@ server.route({
 			})
 		})
 	}
-})
+});
+
+server.route({
+	method: 'POST',
+	path: '/getFavorites',
+	handler: function (request, reply) {
+		User.findOne({where: {username: request.payload.username}, include: [{model: Course, as: 'favorites'}]}).then(function (user) {
+			reply(user.favorites);
+		})
+	}
+});
 
 server.route({
 	method: 'GET',
