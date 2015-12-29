@@ -13,10 +13,12 @@ var sequelize = new Sequelize('golf', 'postgres', 'postgres', {
 
 var User = sequelize.define('user', {
 	username: Sequelize.STRING,
-	email: Sequelize.STRING,
-	password: Sequelize.STRING,
-	handicap: Sequelize.FLOAT,
-	winnings: Sequelize.FLOAT
+	token: Sequelize.STRING,
+	gamesWon: Sequelize.FLOAT,
+	gamesPlayed: Sequelize.FLOAT,
+	lastPlayed: Sequelize.DATEONLY,
+	winnings: Sequelize.FLOAT,
+	handicap: Sequelize.FLOAT
 });
 
 var Course = sequelize.define('course', {
