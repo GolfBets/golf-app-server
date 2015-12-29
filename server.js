@@ -250,10 +250,10 @@ server.route({
 });
 
 server.route({
-	method: 'POST',
-	path: '/getFavorites',
+	method: 'GET',
+	path: '/getFavorites/{name}',
 	handler: function (request, reply) {
-		User.findOne({where: {username: request.payload.username}, include: [{model: Course, as: 'favorites'}]}).then(function (user) {
+		User.findOne({where: {username: {$iLike: request.params.name}}, include: [{model: Course, as: 'favorites', attributes: ['name']}]}).then(function (user) {
 			reply(user.favorites);
 		})
 	}
