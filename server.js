@@ -73,8 +73,8 @@ server.route({
 	path: '/createuser',
 	handler: function (request, reply) {
 		User.findOrCreate({where: {username: request.payload.username}, defaults: {
-			email: request.payload.email,
-			password: request.payload.password,
+			gamesWon: 0,
+			gamesPlayed: 0,
 			handicap: request.payload.handicap,
 			winnings: 0
 		}}).spread( function (user, created) {
