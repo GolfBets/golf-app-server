@@ -1,7 +1,7 @@
 var Hapi = require('hapi');
 
 var server = new Hapi.Server();
-server.connection({port: process.env.PORT || 3000});
+server.connection({port: process.env.PORT});
 
 // var Sequelize = require('sequelize');
 //
