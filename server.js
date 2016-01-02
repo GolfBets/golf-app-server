@@ -196,38 +196,59 @@ server.route({
 		Course.findOne({where: {name: request.payload.course}}).then(function (course) {
 			Game.create({courseId: course.id}).then(function (game) {
 				game.setCourse(course).then(function () {
+          var scoreArray1 = [];
+          var scoreArray2 = [];
+          var scoreArray3 = [];
+          var scoreArray4 = [];
+          for (var i = 1; i < 19; i++) {
+            var temp = 'h'+ i;
+            scoreArray1.push(state.player1score[temp]);
+            if (state.player2score) {
+              scoreArray2.push(state.player2score[temp]);
+            }
+            if (state.player3score) {
+              scoreArray3.push(state.player3score[temp]);
+            }
+            if (state.player4score) {
+              scoreArray4.push(state.player4score[temp]);
+            }
+          }
 					// for (var i = 0; i < request.payload.user.length; i++) {
 
 						//putting in a for loop caused async issues, loop finishes before user finding ever happens
 
-						Score.create({playernumber: 0}).then(function (score) {
+						Score.create({playernumber: 0, score: scoreArray1}).then(function (score) {
 							score.addIndividualgame(game);
 							// game.addIndividualgame(score);
 							User.findOne({where: {username: request.payload.user[0]}}).then(function (user) {
 								user.addScore(score)
 							})
 						})
-						Score.create({playernumber: 1}).then(function (score) {
+						Score.create({playernumber: 1, score: scoreArray2}).then(function (score) {
 							score.addIndividualgame(game);
 							// game.addIndividualgame(score);
-							User.findOne({where: {username: request.payload.user[1]}}).then(function (user) {
+							User.findOne({where: {id: 1}}).then(function (user) {
 								user.addScore(score)
 							})
 						})
-						Score.create({playernumber: 2}).then(function (score) {
-							score.addIndividualgame(game);
-							// game.addIndividualgame(score);
-							User.findOne({where: {username: request.payload.user[2]}}).then(function (user) {
-								user.addScore(score)
-							})
-						})
-						Score.create({playernumber: 3}).then(function (score) {
-							score.addIndividualgame(game);
-							// game.addIndividualgame(score);
-							User.findOne({where: {username: request.payload.user[3]}}).then(function (user) {
-								user.addScore(score)
-							})
-						})
+            if (state.player3score) {
+  						Score.create({playernumber: 2, score: scoreArray3}).then(function (score) {
+  							score.addIndividualgame(game);
+  							// game.addIndividualgame(score);
+  							User.findOne({where: {id: 2}}).then(function (user) {
+  								user.addScore(score)
+  							})
+  						})
+            }
+            if(state.player4score){
+  						Score.create({playernumber: 3, score: scoreArray4}).then(function (score) {
+  							score.addIndividualgame(game);
+  							// game.addIndividualgame(score);
+  							User.findOne({where: {id: 3}}).then(function (user) {
+  								user.addScore(score)
+  							})
+  						})
+            }
 
 					// }
 					reply('Game Created');
