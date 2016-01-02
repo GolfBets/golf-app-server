@@ -153,7 +153,7 @@ server.route({
 		var location = request.params.location
 		Course.findAll({where: {county: location}, attributes: ['name', 'city'], order: 'name ASC'}).then(function (courses) {
 			reply(courses);
-		})		
+		})
 	}
 });
 
@@ -164,7 +164,7 @@ server.route({
 		var location = request.params.location.split('/');
 		Course.findAll({where: {county: location[0], city: location[1]}, attributes: ['name'], order: 'name ASC'}).then(function (courses) {
 			reply(courses);
-		})		
+		})
 	}
 });
 
@@ -191,7 +191,7 @@ server.route({
 
 server.route({
 	method: 'POST',
-	path: '/newGame',
+	path: '/submitGame',
 	handler: function (request, reply) {
 		Course.findOne({where: {name: request.payload.course}}).then(function (course) {
 			Game.create({courseId: course.id}).then(function (game) {
@@ -228,13 +228,13 @@ server.route({
 								user.addScore(score)
 							})
 						})
-						
+
 					// }
 					reply('Game Created');
 				})
 			})
 		})
-	}	
+	}
 });
 
 server.route({

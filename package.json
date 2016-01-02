@@ -6,6 +6,9 @@
   "scripts": {
     "start": "nodemon ./server.js"
   },
+  "engines": {
+    "node": "4.2.3"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/RyanYocum/golf-app-server.git"
