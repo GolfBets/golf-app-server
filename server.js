@@ -35,7 +35,8 @@ var Course = sequelize.define('course', {
 
 var Score = sequelize.define('score', {
 	score: { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
-	playernumber: Sequelize.FLOAT
+	playernumber: Sequelize.FLOAT,
+	winnings: Sequelize.FLOAT
 })
 
 var Game = sequelize.define('game', {
@@ -202,29 +203,29 @@ server.route({
           var scoreArray4 = [];
           for (var i = 1; i < 19; i++) {
             var temp = 'h'+ i;
-            scoreArray1.push(state.player1score[temp]);
-            if (state.player2score) {
-              scoreArray2.push(state.player2score[temp]);
+            scoreArray1.push(request.payload.player1score[temp]);
+            if (request.payload.player2score) {
+              scoreArray2.push(request.payload.player2score[temp]);
             }
-            if (state.player3score) {
-              scoreArray3.push(state.player3score[temp]);
+            if (request.payload.player3score[0]) {
+              scoreArray3.push(request.payload.player3score[temp]);
             }
-            if (state.player4score) {
-              scoreArray4.push(state.player4score[temp]);
+            if (request.payload.player4score[0]) {
+              scoreArray4.push(request.payload.player4score[temp]);
             }
           }
 					// for (var i = 0; i < request.payload.user.length; i++) {
 
 						//putting in a for loop caused async issues, loop finishes before user finding ever happens
 
-						Score.create({playernumber: 0, score: scoreArray1}).then(function (score) {
+						Score.create({playernumber: 0, score: scoreArray1, winnings: request.payload.player1Results}).then(function (score) {
 							score.addIndividualgame(game);
 							// game.addIndividualgame(score);
-							User.findOne({where: {username: request.payload.user[0]}}).then(function (user) {
+							User.findOne({where: {username: request.payload.player1}}).then(function (user) {
 								user.addScore(score)
 							})
 						})
-						Score.create({playernumber: 1, score: scoreArray2}).then(function (score) {
+						Score.create({playernumber: 1, score: scoreArray2, winnings: request.payload.player2Results}).then(function (score) {
 							score.addIndividualgame(game);
 							// game.addIndividualgame(score);
 							User.findOne({where: {id: 1}}).then(function (user) {
@@ -232,7 +233,7 @@ server.route({
 							})
 						})
             if (state.player3score) {
-  						Score.create({playernumber: 2, score: scoreArray3}).then(function (score) {
+  						Score.create({playernumber: 2, score: scoreArray3, winnings: request.payload.player3Results}).then(function (score) {
   							score.addIndividualgame(game);
   							// game.addIndividualgame(score);
   							User.findOne({where: {id: 2}}).then(function (user) {
@@ -241,7 +242,7 @@ server.route({
   						})
             }
             if(state.player4score){
-  						Score.create({playernumber: 3, score: scoreArray4}).then(function (score) {
+  						Score.create({playernumber: 3, score: scoreArray4, winnings: request.payload.player4Results}).then(function (score) {
   							score.addIndividualgame(game);
   							// game.addIndividualgame(score);
   							User.findOne({where: {id: 3}}).then(function (user) {
@@ -276,6 +277,7 @@ server.route({
 	method: 'GET',
 	path: '/getFavorites/{name}',
 	handler: function (request, reply) {
+		console.log('gettin favorites')
 		User.findOne({where: {username: {$iLike: request.params.name}}, include: [{model: Course, as: 'favorites', attributes: ['name']}]}).then(function (user) {
 			reply(user.favorites);
 		})
