@@ -207,10 +207,10 @@ server.route({
             if (request.payload.player2score) {
               scoreArray2.push(request.payload.player2score[temp]);
             }
-            if (request.payload.player3score[0]) {
+            if (request.payload.player3score.h1) {
               scoreArray3.push(request.payload.player3score[temp]);
             }
-            if (request.payload.player4score[0]) {
+            if (request.payload.player4score.h1) {
               scoreArray4.push(request.payload.player4score[temp]);
             }
           }
@@ -232,7 +232,7 @@ server.route({
 								user.addScore(score)
 							})
 						})
-            if (state.player3score) {
+            if (scoreArray3[0]) {
   						Score.create({playernumber: 2, score: scoreArray3, winnings: request.payload.player3Results}).then(function (score) {
   							score.addIndividualgame(game);
   							// game.addIndividualgame(score);
@@ -241,7 +241,7 @@ server.route({
   							})
   						})
             }
-            if(state.player4score){
+            if(scoreArray4[0]){
   						Score.create({playernumber: 3, score: scoreArray4, winnings: request.payload.player4Results}).then(function (score) {
   							score.addIndividualgame(game);
   							// game.addIndividualgame(score);
@@ -299,7 +299,7 @@ server.route({
 	method: 'GET',
 	path: '/getGamesFromUser',
 	handler: function (request, reply) {
-		User.findOne({where: {id: 1}, include: [{model: Score, as: 'individualgame'}]}).then(function (user) {
+		User.findOne({where: {id: 1}, include: [{model: Score, as: 'userId'}]}).then(function (user) {
 			console.log(user);
 			reply(user);
 		})
