@@ -8,7 +8,7 @@ var Sequelize = require('sequelize');
 var sequelize = new Sequelize(process.env.DBDB || 'golf', process.env.DBUSER || 'postgres', process.env.DBPW || 'postgres', {
   host: process.env.DBHOST || 'localhost',
   dialect: 'postgres',
-  logging: false
+  // logging: false
 });
 
 var User = sequelize.define('user', {
@@ -37,10 +37,20 @@ var Score = sequelize.define('score', {
 	score: { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
 	playernumber: Sequelize.FLOAT,
 	winnings: Sequelize.FLOAT
-})
+});
 
 var Game = sequelize.define('game', {
 	inprogress: { type: Sequelize.BOOLEAN}
+});
+
+var Guest = sequelize.define('guest', {
+  name: Sequelize.STRING,
+});
+
+var GuestScore = sequelize.define('guestscore', {
+	score: { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
+	playernumber: Sequelize.FLOAT,
+	winnings: Sequelize.FLOAT
 });
 
 User.hasMany(Score);
@@ -220,7 +230,7 @@ server.route({
 
 						Score.create({playernumber: 0, score: scoreArray1, winnings: request.payload.player1Results}).then(function (score) {
 							score.addIndividualgame(game);
-							// game.addIndividualgame(score);
+							game.addIndividualgame(score);
 							User.findOne({where: {username: request.payload.player1}}).then(function (user) {
 								user.addScore(score)
 							})
@@ -228,7 +238,7 @@ server.route({
 						Score.create({playernumber: 1, score: scoreArray2, winnings: request.payload.player2Results}).then(function (score) {
 							score.addIndividualgame(game);
 							// game.addIndividualgame(score);
-							User.findOne({where: {id: 1}}).then(function (user) {
+							User.findOrCreate({where: {username: 1}}).then(function (user) {
 								user.addScore(score)
 							})
 						})
