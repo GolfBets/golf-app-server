@@ -5,53 +5,18 @@ server.connection({port: port});
 
 var Sequelize = require('sequelize');
 
-var sequelize = new Sequelize(process.env.DBDB || 'golf', process.env.DBUSER || 'postgres', process.env.DBPW || 'postgres', {
+sequelize = new Sequelize(process.env.DBDB || 'golf', process.env.DBUSER || 'postgres', process.env.DBPW || 'postgres', {
   host: process.env.DBHOST || 'localhost',
   dialect: 'postgres',
   // logging: false
 });
 
-var User = sequelize.define('user', {
-	username: Sequelize.STRING,
-	token: Sequelize.STRING,
-	gamesWon: Sequelize.FLOAT,
-	gamesPlayed: Sequelize.FLOAT,
-	lastPlayed: Sequelize.DATEONLY,
-	winnings: Sequelize.FLOAT,
-	handicap: Sequelize.FLOAT
-});
-
-var Course = sequelize.define('course', {
-	county: Sequelize.STRING,
-	city: Sequelize.STRING,
-	name: Sequelize.STRING,
-	rating: Sequelize.FLOAT,
-	slope: Sequelize.FLOAT,
-	par:  { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
-	hdcp:  { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
-	parL:  { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
-	hdcpL:  { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
-});
-
-var Score = sequelize.define('score', {
-	score: { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
-	playernumber: Sequelize.FLOAT,
-	winnings: Sequelize.FLOAT
-});
-
-var Game = sequelize.define('game', {
-	inprogress: { type: Sequelize.BOOLEAN}
-});
-
-var Guest = sequelize.define('guest', {
-  name: Sequelize.STRING,
-});
-
-var GuestScore = sequelize.define('guestscore', {
-	score: { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
-	playernumber: Sequelize.FLOAT,
-	winnings: Sequelize.FLOAT
-});
+var User = sequelize.import('./db_models/UserModel.js');
+var Course = sequelize.import('./db_models/CourseModel.js');
+var Score = sequelize.import('./db_models/ScoreModel.js');
+var Game = sequelize.import('./db_models/GameModel.js');
+var Guest = sequelize.import('./db_models/GuestModel.js');
+var GuestScore = sequelize.import('./db_models/GuestScoreModel.js');
 
 User.hasMany(Score);
 User.belongsToMany(Course, {as: 'favorites', through: 'favorites'});
@@ -62,9 +27,7 @@ Score.belongsToMany(Game, {as: 'individualgame', through: 'individualgame'});
 Game.belongsToMany(Score, {as: 'individualgame', through: 'individualgame'});
 Game.belongsTo(Course);
 
-
 sequelize.sync()
-
 
 server.register(require('inert'), function (err) {
     if (err) {
