@@ -1,5 +1,7 @@
 var Sequelize = require('sequelize');
 var User = require('./UserModel.js');
+var Course = require('./CourseModel.js');
+var Score = require('./ScoreModel.js');
 
 var UserController = {};
 
