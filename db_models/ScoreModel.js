@@ -1,10 +1,9 @@
 var Sequelize = require('sequelize');
 
-module.exports = function(sequelize, DataTypes) {
-	var Score = sequelize.define('score', {
-		score: { type : DataTypes.ARRAY(DataTypes.FLOAT), defaultValue: null},
-		playernumber: DataTypes.FLOAT,
-		winnings: DataTypes.FLOAT
-	});
-	return Score;
-};
+var Score = sequelize.define('score', {
+	score: { type : Sequelize.ARRAY(Sequelize.FLOAT), defaultValue: null},
+	playernumber: Sequelize.FLOAT,
+	winnings: Sequelize.FLOAT
+});
+
+module.exports = Score;

@@ -11,12 +11,12 @@ sequelize = new Sequelize(process.env.DBDB || 'golf', process.env.DBUSER || 'pos
   // logging: false
 });
 
-var User = sequelize.import('./db_models/UserModel.js');
-var Course = sequelize.import('./db_models/CourseModel.js');
-var Score = sequelize.import('./db_models/ScoreModel.js');
-var Game = sequelize.import('./db_models/GameModel.js');
-var Guest = sequelize.import('./db_models/GuestModel.js');
-var GuestScore = sequelize.import('./db_models/GuestScoreModel.js');
+var User = require('./db_models/UserModel.js');
+var Course = require('./db_models/CourseModel.js');
+var Score = require('./db_models/ScoreModel.js');
+var Game = require('./db_models/GameModel.js');
+var Guest = require('./db_models/GuestModel.js');
+var GuestScore = require('./db_models/GuestScoreModel.js');
 
 User.hasMany(Score);
 User.belongsToMany(Course, {as: 'favorites', through: 'favorites'});
@@ -28,6 +28,8 @@ Game.belongsToMany(Score, {as: 'individualgame', through: 'individualgame'});
 Game.belongsTo(Course);
 
 sequelize.sync()
+
+var userController = require('./db_models/UserController.js')
 
 server.register(require('inert'), function (err) {
     if (err) {
@@ -46,19 +48,7 @@ server.route({
 	method: 'POST',
 	path: '/createuser',
 	handler: function (request, reply) {
-		User.findOrCreate({where: {username: request.payload.username}, defaults: {
-			gamesWon: 0,
-			gamesPlayed: 0,
-			handicap: request.payload.handicap,
-			winnings: 0
-		}}).spread( function (user, created) {
-			if (created === false) {
-				reply('user already exists');
-			}
-			else {
-				reply('user created');
-			}
-		})
+		userController.createUser(request, reply);
 	}
 });
 
@@ -84,9 +74,7 @@ server.route({
 	method: 'GET',
 	path: '/users',
 	handler: function (request, reply) {
-		User.findAll().done(function (users) {
-			reply(users);
-		})
+		userController.getUsers(request, reply);
 	}
 });
 
@@ -94,9 +82,7 @@ server.route({
 	method: 'GET',
 	path: '/user/{user}',
 	handler: function (request, reply) {
-		User.findOne({where: {username: request.params.user}}, {include: [{model: Course, as: 'favorites'}]}).then( function (user) {
-			reply(user);
-		})
+		userController.getSpecificUser(request, reply);
 	}
 });
 
@@ -236,13 +222,7 @@ server.route({
 	method: 'POST',
 	path: '/addFavorite',
 	handler: function (request, reply) {
-		User.findOne({where: {username: request.payload.username}}).then(function (user) {
-			Course.findOne({where: {name: request.payload.course}}).then(function (course) {
-				user.addFavorite(course).then(function () {
-					reply('added favorite');
-				})
-			})
-		})
+		userController.addFavorite(request, reply);
 	}
 });
 
@@ -250,10 +230,7 @@ server.route({
 	method: 'GET',
 	path: '/getFavorites/{name}',
 	handler: function (request, reply) {
-		console.log('gettin favorites')
-		User.findOne({where: {username: {$iLike: request.params.name}}, include: [{model: Course, as: 'favorites', attributes: ['name']}]}).then(function (user) {
-			reply(user.favorites);
-		})
+		userController.getFavorites(request, reply);
 	}
 });
 
@@ -272,10 +249,7 @@ server.route({
 	method: 'GET',
 	path: '/getGamesFromUser',
 	handler: function (request, reply) {
-		User.findOne({where: {id: 1}, include: [{model: Score, as: 'userId'}]}).then(function (user) {
-			console.log(user);
-			reply(user);
-		})
+		userController.getGamesFromUser(request, reply)
 	}
 });
 
