@@ -29,7 +29,8 @@ Game.belongsTo(Course);
 
 sequelize.sync()
 
-var userController = require('./db_models/UserController.js')
+var userController = require('./db_models/UserController.js');
+var courseController = require('./db_models/CourseController');
 
 server.register(require('inert'), function (err) {
     if (err) {
@@ -56,17 +57,7 @@ server.route({
 	method: 'POST',
 	path: '/createcourse',
 	handler: function (request, reply) {
-		Course.findOrCreate({where: {name: request.payload.name}, defaults: {
-			par: request.payload.par,
-			handicap: request.payload.handicap
-		}}).spread(function (course, created) {
-			if (!created) {
-				reply('Already exists');
-			}
-			else {
-				reply(course);
-			}
-		})
+		courseController.createCourse(request, reply);
 	}
 });
 
@@ -90,9 +81,7 @@ server.route({
 	method: "GET",
 	path: "/courses",
 	handler: function (request, reply) {
-		Course.findAll().done(function (courses) {
-			reply(courses);
-		})
+		courseController.getCourses(request, reply);
 	}
 });
 
@@ -100,9 +89,7 @@ server.route({
 	method: "GET",
 	path: "/coursenames",
 	handler: function (request, reply) {
-		Course.findAll({attributes: ['name']}).done(function (courses) {
-			reply(courses);
-		})
+		courseController.getCourseNames(request, reply);
 	}
 });
 
@@ -110,10 +97,7 @@ server.route({
 	method: "GET",
 	path: "/coursenames/{location*1}",
 	handler: function (request, reply) {
-		var location = request.params.location
-		Course.findAll({where: {county: location}, attributes: ['name', 'city'], order: 'name ASC'}).then(function (courses) {
-			reply(courses);
-		})
+		courseController.getCoursesByCounty(request, reply);
 	}
 });
 
@@ -121,10 +105,7 @@ server.route({
 	method: "GET",
 	path: "/coursenames/{location*2}",
 	handler: function (request, reply) {
-		var location = request.params.location.split('/');
-		Course.findAll({where: {county: location[0], city: location[1]}, attributes: ['name'], order: 'name ASC'}).then(function (courses) {
-			reply(courses);
-		})
+		courseController.getCoursesByCountyCity(request, reply);
 	}
 });
 
@@ -132,10 +113,7 @@ server.route({
 	method: "GET",
 	path: "/coursesbycity/{city}",
 	handler: function (request, reply) {
-		var city = request.params.city;
-		Course.findAll({where: {city: {$iLike: city}}, attributes: ['name'], order: 'name ASC'}).then(function (courses) {
-			reply(courses);
-		})
+		courseController.getCoursesByCity(request, reply);
 	}
 });
 
@@ -143,9 +121,7 @@ server.route({
 	method: "GET",
 	path: "/course/{name*}",
 	handler: function (request, reply) {
-		Course.findOne({where: {name: {$iLike: request.params.name}}}).done(function (course) {
-			reply(course);
-		})
+		courseController.getCourseByName(request, reply);
 	}
 });
 
